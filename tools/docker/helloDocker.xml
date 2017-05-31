@@ -1,0 +1,19 @@
+<tool id="blast" name="NCBI BLAST DOCKER" version="0.0" >
+    <description>ncbi-blast-docker</description>
+    <requirements>
+	    <container type="docker">simonalpha/ncbi-blast-docker</container>
+    </requirements>
+<!--
+singularity exec simonalpha_ncbi-blast-docker-2015-01-03-dc060f13c153.img blastp -query blast/proteins.fasta -db blast/db/pdbaa -out proteins_blastp.txt
+
+blastp -query /tmp/blast/proteins.fasta -db /tmp/blast/db/pdbaa -out $output
+-->
+    <command>blastp -query /home/nikoloutsa/Projects/TACC-Singularity/blast/proteins.fasta -db /home/nikoloutsa/Projects/TACC-Singularity/blast/db/pdbaa -out proteins_blastp.txt</command>
+    <inputs>
+    </inputs>
+    <outputs>
+        <data name="output" format="txt" from_work_dir="proteins_blastp.txt" />
+    </outputs>
+    <help>
+    </help>
+</tool>

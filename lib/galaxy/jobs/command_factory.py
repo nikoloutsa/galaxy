@@ -38,6 +38,7 @@ def build_command(
     job_wrapper,
     container=None,
     modify_command_for_container=True,
+    image=None,
     include_metadata=False,
     include_work_dir_outputs=True,
     create_tool_working_directory=True,

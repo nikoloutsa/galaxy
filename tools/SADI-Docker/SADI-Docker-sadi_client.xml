@@ -1,0 +1,30 @@
+<tool id="SADI-Docker-sadi_client" name="SADI client" version="0.1">
+	<description>Invoke a SADI service, given an input RDF, synchronously</description>
+	<requirements>
+	  <container type="docker">mikeleganaaranguren/sadi:v6</container>
+	</requirements>
+	
+	<command>java -jar /sadi/sadi_client.jar $url $input > $output 2>/dev/null</command>
+		
+	<inputs>
+		<param name="url" type="text" size="250" label="Service URL">
+		  <sanitizer sanitize="False"/><!-- Disable sanitizer for URLs with e.g. tilde character -->
+		</param>
+		<param name="input" type="data" format="rdf" label="RDF input for SADI service"/>	
+	</inputs>
+	<outputs>
+		<data format="rdf" name="output" />
+	</outputs>
+	
+	<help>
+	  
+	  **What it does**
+	  
+	  Given an RDF input and a SADI service URL, sends the input to the service obtaining an output, synchronously. 
+	  
+	  **About**
+	  
+	  More information and contact: http://github.com/mikel-egana-aranguren/SADI-Docker-Galaxy.
+	  
+	</help>
+</tool>

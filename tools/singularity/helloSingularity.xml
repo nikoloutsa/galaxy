@@ -1,0 +1,15 @@
+<tool id="singularity_command" name="SINGULARITY COMMAND" version="0.0" >
+    <description>singularity command</description>
+    <command>
+		cd $workdir; singularity exec $image $command
+    </command>
+    <inputs>
+		<param name="workdir" type="text" label="Workdir Path"/>
+		<param name="image" type="text" label="Image name"/>
+		<param name="command" type="text" />
+    </inputs>
+    <outputs>
+    </outputs>
+    <help>
+    </help>
+</tool>

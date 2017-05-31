@@ -21,6 +21,7 @@ from .container_resolvers.mulled import (
 from .requirements import ContainerDescription
 from .requirements import DEFAULT_CONTAINER_RESOLVE_DEPENDENCIES, DEFAULT_CONTAINER_SHELL
 from ..deps import docker_util
+from ..deps import singularity_util
 
 log = logging.getLogger(__name__)
 
@@ -342,25 +343,48 @@ class DockerContainer(Container):
             host=prop("host", docker_util.DEFAULT_HOST),
         )
 
+        singularity_host_props = dict(
+            singularity_cmd=prop("cmd", singularity_util.DEFAULT_SINGULARITY_COMMAND),
+            sudo=asbool(prop("sudo", singularity_util.DEFAULT_SUDO)),
+            sudo_cmd=prop("sudo_cmd", singularity_util.DEFAULT_SUDO_COMMAND),
+            host=prop("host", singularity_util.DEFAULT_HOST),
+        )
+
         cached_image_file = self.__get_cached_image_file()
         if not cached_image_file:
             # TODO: Add option to cache it once here and create cached_image_file.
             cache_command = docker_util.build_docker_cache_command(self.container_id, **docker_host_props)
         else:
             cache_command = self.__cache_from_file_command(cached_image_file, docker_host_props)
-        run_command = docker_util.build_docker_run_command(
+
+
+        run_command = singularity_util.build_singularity_exec_command(
             command,
-            self.container_id,
-            volumes=volumes,
-            volumes_from=volumes_from,
+            image="/home/nikoloutsa/Projects/TACC-Singularity/simonalpha_ncbi-blast-docker-2015-01-03-dc060f13c153.img", 
             env_directives=env_directives,
             working_directory=working_directory,
             net=prop("net", "none"),  # By default, docker instance has networking disabled
             auto_rm=asbool(prop("auto_rm", docker_util.DEFAULT_AUTO_REMOVE)),
             set_user=prop("set_user", docker_util.DEFAULT_SET_USER),
             run_extra_arguments=prop("run_extra_arguments", docker_util.DEFAULT_RUN_EXTRA_ARGUMENTS),
-            **docker_host_props
+            **singularity_host_props
         )
+
+        #run_command = docker_util.build_docker_run_command(
+        #    command,
+        #    self.container_id,
+        #    volumes=volumes,
+        #    volumes_from=volumes_from,
+        #    env_directives=env_directives,
+        #    working_directory=working_directory,
+        #    net=prop("net", "none"),  # By default, docker instance has networking disabled
+        #    auto_rm=asbool(prop("auto_rm", docker_util.DEFAULT_AUTO_REMOVE)),
+        #    set_user=prop("set_user", docker_util.DEFAULT_SET_USER),
+        #    run_extra_arguments=prop("run_extra_arguments", docker_util.DEFAULT_RUN_EXTRA_ARGUMENTS),
+        #    **docker_host_props
+        #)
+        log.debug("\n\n****SINGULARITY run_command: %s",run_command)
+        #import pdb; pdb.set_trace()
         return "%s\n%s" % (cache_command, run_command)
 
     def __cache_from_file_command(self, cached_image_file, docker_host_props):
