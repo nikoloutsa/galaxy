@@ -69,12 +69,37 @@ def build_command(
 
     __handle_version_command(commands_builder, job_wrapper)
     __handle_task_splitting(commands_builder, job_wrapper)
+    
 
     # One could imagine also allowing dependencies inside of the container but
     # that is too sophisticated for a first crack at this - build your
     # containers ready to go!
-    if not container or container.resolve_dependencies:
+    if not image or not container or container.resolve_dependencies:
         __handle_dependency_resolution(commands_builder, job_wrapper, remote_command_params)
+
+    ##############################################################
+    if (image and modify_command_for_container) or job_wrapper.commands_in_new_shell:
+        if image and modify_command_for_container:
+            # Many Docker containers do not have /bin/bash.
+            external_command_shell = container.shell
+        else:
+            external_command_shell = shell
+        externalized_commands = __externalize_commands(job_wrapper, external_command_shell, commands_builder, remote_command_params)
+        if image and modify_command_for_container:
+            # Stop now and build command before handling metadata and copying
+            # working directory files back. These should always happen outside
+            # of docker container - no security implications when generating
+            # metadata and means no need for Galaxy to be available to container
+            # and not copying workdir outputs back means on can be more restrictive
+            # of where container can write to in some circumstances.
+            run_in_container_command = container.containerize_command(
+                externalized_commands
+            )
+            commands_builder = CommandsBuilder( run_in_container_command )
+            log.debug("\n\nCOMMAND FACTORYYYYYY (%s) " % (dir(run_in_container_command)))
+        else:
+            commands_builder = CommandsBuilder( externalized_commands )
+    ##############################################################
 
     if (container and modify_command_for_container) or job_wrapper.commands_in_new_shell:
         if container and modify_command_for_container:
@@ -96,6 +121,8 @@ def build_command(
             commands_builder = CommandsBuilder( run_in_container_command )
         else:
             commands_builder = CommandsBuilder( externalized_commands )
+
+    import pdb; pdb.set_trace()
 
     # Don't need to create a separate tool working directory for Pulsar
     # jobs - that is handled by Pulsar.

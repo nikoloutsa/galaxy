@@ -198,6 +198,7 @@ class BaseJobRunner( object ):
     def build_command_line( self, job_wrapper, include_metadata=False, include_work_dir_outputs=True,
                             modify_command_for_container=True ):
         container = self._find_container( job_wrapper )
+        image = True
         if not container and job_wrapper.requires_containerization:
             raise Exception("Failed to find a container when required, contact Galaxy admin.")
         return build_command(
@@ -206,7 +207,8 @@ class BaseJobRunner( object ):
             include_metadata=include_metadata,
             include_work_dir_outputs=include_work_dir_outputs,
             modify_command_for_container=modify_command_for_container,
-            container=container
+            container=container,
+            image=image
         )
 
     def get_work_dir_outputs( self, job_wrapper, job_working_directory=None, tool_working_directory=None ):
@@ -346,6 +348,7 @@ class BaseJobRunner( object ):
         tool = job_wrapper.tool
         from galaxy.tools.deps import containers
         tool_info = containers.ToolInfo(tool.containers, tool.requirements)
+        #import pdb; pdb.set_trace()
         job_info = containers.JobInfo(
             compute_working_directory,
             compute_tool_directory,

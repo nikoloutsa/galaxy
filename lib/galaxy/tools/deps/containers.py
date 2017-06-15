@@ -307,6 +307,8 @@ class Container( object ):
         input command in container.
         """
 
+class SingularityImage():
+        abcd = []
 
 class DockerContainer(Container):
 
@@ -461,6 +463,7 @@ def docker_cache_path(cache_directory, container_id):
 
 CONTAINER_CLASSES = dict(
     docker=DockerContainer,
+    singularity=SingularityImage,
 )
 
 

@@ -150,6 +150,7 @@ DEFAULT_CONTAINER_TYPE = "docker"
 DEFAULT_CONTAINER_RESOLVE_DEPENDENCIES = False
 DEFAULT_CONTAINER_SHELL = "/bin/sh"  # Galaxy assumes bash, but containers are usually thinner.
 
+DEFAULT_IMAGE_TYPE = "singularity"
 
 @six.python_2_unicode_compatible
 class ContainerDescription( object ):
@@ -194,7 +195,8 @@ class ContainerDescription( object ):
 def parse_requirements_from_dict( root_dict ):
     requirements = root_dict.get("requirements", [])
     containers = root_dict.get("containers", [])
-    return ToolRequirements.from_list(requirements), map(ContainerDescription.from_dict, containers)
+    images = root_dict.get("images", [])
+    return ToolRequirements.from_list(requirements), map(ContainerDescription.from_dict, containers), map(ContainerDescription.from_dict, images)
 
 
 def parse_requirements_from_xml( xml_root ):
@@ -238,9 +240,15 @@ def parse_requirements_from_xml( xml_root ):
     if requirements_elem is not None:
         container_elems = requirements_elem.findall( 'container' )
 
-    containers = map(container_from_element, container_elems)
+    image_elems = []
+    if requirements_elem is not None:
+        image_elems = requirements_elem.findall( 'image' )
 
-    return requirements, containers
+    containers = map(container_from_element, container_elems)
+    images = map(image_from_element, image_elems)
+
+
+    return requirements, containers , images
 
 
 def container_from_element(container_elem):
@@ -255,3 +263,16 @@ def container_from_element(container_elem):
         shell=shell,
     )
     return container
+
+def image_from_element(image_elem):
+    identifier = xml_text(image_elem)
+    type = image_elem.get("type", DEFAULT_IMAGE_TYPE)
+    resolve_dependencies = asbool(image_elem.get("resolve_dependencies", DEFAULT_CONTAINER_RESOLVE_DEPENDENCIES))
+    shell = image_elem.get("shell", DEFAULT_CONTAINER_SHELL)
+    image = ContainerDescription(
+        identifier=identifier,
+        type=type,
+        resolve_dependencies=resolve_dependencies,
+        shell=shell,
+    )
+    return image 

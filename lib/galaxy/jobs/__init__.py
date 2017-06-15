@@ -437,9 +437,14 @@ class JobConfiguration( object, ConfiguresHandlers ):
         for param in parent.findall('param'):
             key = param.get('id')
             if key in ["container", "container_override"]:
+                import pdb; pdb.set_trace()
                 from galaxy.tools.deps import requirements
                 containers = map(requirements.container_from_element, list(param))
                 param_value = map(lambda c: c.to_dict(), containers)
+            if key in ["image"]:
+                from galaxy.tools.deps import requirements
+                images = map(requirements.image_from_element, list(param))
+                param_value = map(lambda i: i.to_dict(), images)
             else:
                 param_value = param.text
 

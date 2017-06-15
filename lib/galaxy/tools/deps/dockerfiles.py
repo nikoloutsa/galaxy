@@ -23,7 +23,7 @@ def dockerfile_build(path, dockerfile=None, error=log.error, **kwds):
     expected_container_names = set()
     tool_directories = set()
     for (tool_path, tool_xml) in loader_directory.load_tool_elements_from_path(path):
-        requirements, containers = parse_requirements_from_xml(tool_xml)
+        requirements, containers , images = parse_requirements_from_xml(tool_xml)
         for container in containers:
             if container.type == "docker":
                 expected_container_names.add(container.identifier)

@@ -701,9 +701,10 @@ class Tool( object, Dictifiable ):
         self.__parse_tests(tool_source)
 
         # Requirements (dependencies)
-        requirements, containers = tool_source.parse_requirements_and_containers()
+        requirements, containers, images = tool_source.parse_requirements_and_containers()
         self.requirements = requirements
         self.containers = containers
+        self.images = images
 
         self.citations = self._parse_citations( tool_source )
 
