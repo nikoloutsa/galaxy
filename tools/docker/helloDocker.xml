@@ -1,7 +1,10 @@
 <tool id="blast" name="NCBI BLAST DOCKER" version="0.0" >
     <description>ncbi-blast-docker</description>
     <requirements>
+<!--
 	    <container type="docker">simonalpha/ncbi-blast-docker</container>
+-->
+	    <image type="singularity">simonalpha_ncbi-blast-docker-2015-01-03-dc060f13c153.img</image>
     </requirements>
 <!--
 singularity exec simonalpha_ncbi-blast-docker-2015-01-03-dc060f13c153.img blastp -query blast/proteins.fasta -db blast/db/pdbaa -out proteins_blastp.txt
